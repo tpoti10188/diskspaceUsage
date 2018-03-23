@@ -1,0 +1,41 @@
+[
+    {
+      "id": "1",
+      "server": "uxo4",
+      "clientCode": "FM",
+      "firstName": "Scott",
+      "lastName": "Poti",
+      "deparment": "Integrations",
+      "startDate": "01/01/2018",
+      "endDate": "12/31/2018",
+      "email":"scottpoti@quadax.com",
+      "alert": true,
+      "permanent": false
+    },
+    {
+        "id": "2",
+        "server": "uxo4",
+        "clientCode": "CK",
+        "firstName": "Josie",
+        "lastName": "Whales",
+        "deparment": "Boston",
+        "startDate": "01/01/2018",
+        "endDate": "12/31/2018",
+        "email":"jwhales@quadax.com",
+        "alert": true,
+        "permanent": false
+    },
+    {
+        "id": "3",
+        "server": "uxo4",
+        "clientCode": "WR",
+        "firstName": "Cyrus",
+        "lastName": "Bernard",
+        "deparment": "Blue",
+        "startDate": "01/01/2018",
+        "endDate": "12/31/2018",
+        "email":"CBernard@quadax.com",
+        "alert": true,
+        "permanent": false
+    }
+  ]

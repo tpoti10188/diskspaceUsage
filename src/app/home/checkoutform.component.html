@@ -1,0 +1,233 @@
+<p-dialog [closable]="false" [(visible)]="display" [modal]="true" [width]="750" >
+        <p-header class="align-center" >         
+         Add New Checkout Record          
+        </p-header>
+        <div appendTo="body">
+            <div class="col-md-12">FM 05/01/2018 - 05/31/2018 <i class="fa fa-lock align" ></i></div>
+    <div class="row">
+        <div class="col-md-6">
+          <div>
+            <h4>
+              <i class="fa fa-address-card" aria-hidden="true"></i> Owner Info</h4>
+            <hr />
+            <ul class="list-group">
+              <li class="list-group-item">Name: </li>
+              <li class="list-group-item">Email: </li>
+              <li class="list-group-item">Department: </li>
+              <li class="list-group-item">Alert:
+                <button class="btn btn-warning btn-sm text-white" data-toggle="tooltip" data-placement="top" title="Alerts On">
+                  <i class="fa fa-bell" aria-hidden="true"></i>
+                </button>
+              </li>
+              <li class="list-group-item">Permanent: </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h4>
+            <i class="fa fa-users" aria-hidden="true"></i> Sub-Owner(s) Info</h4>
+          <hr />
+          <ul class="list-group">
+            <li class="list-group-item">Name: </li>
+            <li class="list-group-item">Email:</li>
+            <li class="list-group-item">Alert:</li>
+          </ul>
+        </div>
+      </div>
+        </div>
+      
+        <p-footer>
+            <div class="row header" style="width: 100%;">
+                <div class="col-md-3">
+                  <button class="btn btn-info btn-lg" (click)='updateEntry()' data-toggle="tooltip" data-placement="top" title="Update Entry">
+                    <i class="fa fa-edit fa-lg"></i>
+                  </button>
+                  <button class="btn btn-danger btn-lg" (click)='removeEntry()' data-toggle="tooltip" data-placement="top" title="Delete Entry">
+                    <i class="fa fa-trash fa-lg"></i>
+                  </button>
+                </div>
+                <div class="col-md-9">
+                  <button type="button" class="btn btn-outline-primary btn-lg" (click)="showDialog()">Close</button>
+                </div>
+    
+              </div>
+        </p-footer>
+    </p-dialog>
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    Add New Checkout Record
+  </div>
+  <div class="panel-body">
+    <form class="form-horizontal" novalidate (ngSubmit)="save()" [formGroup]="checkoutForm">
+      <fieldset>
+        <div class="form-group">
+          <label class="col-md-2 control-label" for="serverId">Server</label>
+          <div class="col-md-4">
+            <th colspan="1">
+              <p-dropdown [options]="servers" [(ngModel)]="selectedServer" placeholder="Select a Server " optionLabel="name"></p-dropdown>
+            </th>
+          </div>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('clientCode').touched || checkoutForm.get('clientCode').dirty) && !checkoutForm.get('clientCode').valid }">
+          <label class="col-md-2 control-label" for="clientCodeId">Client Code</label>
+          <div class="col-md-4">
+            <input class="form-control" id="clientCodeId" type="text" placeholder="Client Code (required)" formControlName="clientCode"/>
+            <span class="help-block" *ngIf="(checkoutForm.get('clientCode').touched || checkoutForm.get('clientCode').dirty) && checkoutForm.get('clientCode').errors">
+              <span *ngIf="checkoutForm.get('clientCode').errors.required">
+                Please enter a Client Code.
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('firstName').touched || checkoutForm.get('firstName').dirty) && !checkoutForm.get('firstName').valid  }">
+          <label class="col-md-2 control-label" for="firstNameId">First Name</label>
+          <div class="col-md-4">
+            <input class="form-control" id="firstNameId" type="text" placeholder="First Name (required)" formControlName="firstName"/>
+            <span class="help-block" *ngIf="(checkoutForm.get('firstName').touched || checkoutForm.get('firstName').dirty) && checkoutForm.get('firstName').errors">
+              <span *ngIf="checkoutForm.get('firstName').errors.required">
+                Please enter a First Name.
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('lastName').touched || checkoutForm.get('lastName').dirty) && !checkoutForm.get('lastName').valid }">
+          <label class="col-md-2 control-label" for="lastNameId">Last Name</label>
+          <div class="col-md-4">
+            <input class="form-control" id="lastNameId" type="text" placeholder="Last Name (required)" formControlName="lastName" />
+            <span class="help-block" *ngIf="(checkoutForm.get('lastName').touched || checkoutForm.get('lastName').dirty) && checkoutForm.get('lastName').errors">
+              <span *ngIf="checkoutForm.get('lastName').errors.required">
+                Please enter a Last Name.
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('department').touched || checkoutForm.get('department').dirty) && !checkoutForm.get('department').valid }">
+          <label class="col-md-2 control-label" for="departmentId">Department</label>
+          <div class="col-md-4">
+            <input class="form-control" id="departmentId" type="text" placeholder="Department (required)" formControlName="department"/>
+            <span class="help-block" *ngIf="(checkoutForm.get('department').touched || checkoutForm.get('department').dirty) && checkoutForm.get('department').errors">
+              <span *ngIf="checkoutForm.get('department').errors.required">
+                Please enter a Department.
+              </span>
+            </span>
+          </div>
+        </div>
+        <div formGroupName="dateRangeGroup" [ngClass]="{'has-error': checkoutForm.get('dateRangeGroup').errors  &&
+              !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+          <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('dateRangeGroup.startDate').touched ||
+                                                       checkoutForm.get('dateRangeGroup.startDate').dirty) && 
+                                                      !checkoutForm.get('dateRangeGroup.startDate').valid  &&
+                                                      !checkoutForm.get('dateRangeGroup.startDate').disabled}">
+            <label class="col-md-2 control-label" for="startDateId">Start Date</label>
+            <div class="col-md-4">
+              <input class="form-control" id="startDateId" type="text" placeholder="MM/DD/YYYY (required)" formControlName="startDate"/>
+              <span class="help-block" *ngIf="(checkoutForm.get('dateRangeGroup.startDate').touched ||
+                                                           checkoutForm.get('dateRangeGroup.startDate').dirty) && 
+                                                           checkoutForm.get('dateRangeGroup.startDate').errors">
+                <span *ngIf="checkoutForm.get('dateRangeGroup.startDate').errors.required">
+                  Please enter a Start Date.
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('dateRangeGroup.endDate').touched ||
+                                                                    checkoutForm.get('dateRangeGroup.endDate').dirty) &&
+                                                                   !checkoutForm.get('dateRangeGroup.endDate').valid &&
+                                                                   !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+            <label class="col-md-2 control-label" for="endDateId">End Date</label>
+            <div class="col-md-4">
+              <input class="form-control" id="endDateId" type="text" placeholder="MM/DD/YYYY (required)" formControlName="endDate" />
+              <span class="help-block" *ngIf="(checkoutForm.get('dateRangeGroup.endDate').touched ||
+                                                           checkoutForm.get('dateRangeGroup.endDate').dirty) &&
+                                                           !checkoutForm.get('dateRangeGroup.endDate').disabled &&
+                                                           (checkoutForm.get('dateRangeGroup.endDate').errors  ||
+                                                           checkoutForm.get('dateRangeGroup').errors)">
+                <span *ngIf="checkoutForm.get('dateRangeGroup.endDate').errors?.required">
+                  Please enter a End Date.
+                </span>
+                <span *ngIf="checkoutForm.get('dateRangeGroup').errors?.range">
+                  End Date must be greater than Start Date.
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('email').touched || checkoutForm.get('email').dirty) && !checkoutForm.get('email').valid }">
+          <label class="col-md-2 control-label" for="emailId">Email</label>
+          <div class="col-md-4">
+            <input class="form-control" id="emailId" type="email" placeholder="Email (required)" formControlName="email" />
+            <span class="help-block" *ngIf="(checkoutForm.get('email').touched || checkoutForm.get('email').dirty) && checkoutForm.get('email').errors">
+              <span *ngIf="checkoutForm.get('email').errors.email">
+                Please enter a valid Email Address.
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+
+          <label class="col-md-2 control-label" for="alertId">Email Alerts</label>
+          <div class="col-md-4 checkbox">
+            <input id="alertId" type="checkbox" formControlName="alert">
+
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-md-2 control-label" for="permanentId">Permanent Checkout</label>
+          <div class="col-md-4 checkbox">
+            <input id="permanentId" type="checkbox" formControlName="permanent">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-offset-1 col-md-4 checkbox">
+            <label>
+              <input id="addSubOwnerId" type="checkbox" formControlName="addSubOwner"> Add Sub Owner(s)
+            </label>
+          </div>
+        </div>
+        <span>
+          <button class="btn btn-default" type="button" (click)="addSubOwner()">
+            Add New SubOwner
+          </button>
+          <button class="btn btn-default" type="button" (click)="removeSubOwner()">
+            Remove New SubOwner
+          </button>
+        </span>
+        <div formArrayName='subOwnersGroup' *ngFor="let subowner of subOwnersGroup.controls; let i=index">
+          <div [formGroupName]="i">
+            <div class="form-group">
+              <label class="col-md-2 control-label" attr.for="{{subFirstNameId + i}}"> First Name</label>
+              <div class="col-md-4">
+                <input class="form-control" id="{{subFirstNameId + i}}" type="text" placeholder="First Name (required)" formControlName="firstName"/>
+              </div>
+              <label class="col-md-2 control-label" attr.for="{{subLastNameId + i}}">Last Name</label>
+              <div class="col-md-4">
+                <input class="form-control" id="{{subLastNameId + i}}" type="text" placeholder="Last Name (required)" formControlName="lastName"/>
+              </div>
+              <label class="col-md-2 control-label" attr.for="{{subemailId + i}}">Email</label>
+              <div class="col-md-4">
+                <input class="form-control" id="{{subemailId + i}}" type="email" placeholder="Email (required)" formControlName="email" />
+              </div>
+              <label class="col-md-2 control-label" attr.for="{{subAlertId + i}}">Email Alerts</label>
+              <div class="col-md-4 checkbox">
+                <input id="{{subAlertId + i}}" type="checkbox" formControlName="alert">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-4 col-md-offset-2">
+            <span>
+              <button class="btn btn-primary" type="submit" [disabled]="!checkoutForm.valid">
+                Save
+              </button>
+            </span>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</div>
+<br>Dirty: {{ checkoutForm.dirty }}
+<br>Touched: {{ checkoutForm.touched }}
+<br>Valid: {{ checkoutForm.valid }}
+<br>Value: {{ checkoutForm.value | json }}

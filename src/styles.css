@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+li {
+    font-size: large;
+}
+
+div.panel-heading {
+   font-size: x-large;
+}
+.modal-dialog {
+    position: absolute;
+    top: 30%;
+    /*half of the modal height*/
+    margin-top: -100px;
+  
+    /*half of the modal width*/
+    margin-left: -180px;
+  }
+  .modal-title{
+      text-align: center;
+  }

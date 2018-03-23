@@ -1,0 +1,544 @@
+<div class="panel panel-primary  p-2">
+  <div class="container-fluid">
+    <div class='panel-body'>
+    </div>
+    <p-confirmDialog header="Confirmation" icon="fa fa-question-circle" width="425"></p-confirmDialog>
+    <div class='table-responsive text-center'>
+      <table class='table table-hover'>
+        <thead class='bg-primary text-white'>
+          <tr>
+            <th colspan="1">
+              <p-dropdown [options]="servers" [(ngModel)]="selectedServer" (ngModelChange)="onChange($event)" placeholder="Select a Server "
+                optionLabel="name"></p-dropdown>
+            </th>
+            <th colspan="1">
+              <!-- <h2>Server: {{selectedServer ? selectedServer.code : ''}}</h2> -->
+            </th>
+            <th colspan="5">
+              <div class="ui-inputgroup">
+                <span class="ui-inputgroup-addon">
+                  <i class="fa fa-search"></i>
+                </span>
+                <input [(ngModel)]='listFilter' type="text" id="filterbox" pInputText placeholder="Filter Result(s)">
+                <span class="badge badge-info pt-2">Results: {{filteredCheckouts ? filteredCheckouts.length : 0}} </span>
+              </div>
+            </th>
+            <th colspan="1">
+              <button type="button" pButton (click)="getCheckout('0');" class="ui-button-success" icon="fa-plus" label="Add New Checkout"></button>
+            </th>
+          </tr>
+          <th (click)="sort('Client Code');">
+            <i class="fa fa-handshake-o " aria-hidden="true"></i> Client Code <i class="fa fa-sort " aria-hidden="true"></i> 
+          </th>
+          <th (click)="sort('Date Range');">
+            <i class="fa fa-calendar" aria-hidden="true"></i> Date Range <i class="fa fa-sort " aria-hidden="true"></i> 
+          </th>
+          <th (click)="sort('Checkout Status');">
+            <i class="fa fa-info-circle" aria-hidden="true"></i> Checkout Status <i class="fa fa-sort " aria-hidden="true"></i> 
+          </th>
+          <th (click)="sort('Jira Issue');">
+            <i class="fa fa-child" aria-hidden="true"></i> Jira Issue <i class="fa fa-sort " aria-hidden="true"></i> 
+          </th>
+          <th (click)="sort('HD Event');">
+            <i class="fa fa-bug" aria-hidden="true"></i> HD Event <i class="fa fa-sort " aria-hidden="true"></i> 
+          </th>
+      <!--    <th (click)="sort('Alert');">
+            <i class="fa fa-bell" aria-hidden="true"></i> Alert
+          </th>
+        -->
+          <th (click)="sort('Primary Owner');">
+            <i class="fa fa-address-card" aria-hidden="true"></i> Primary Owner
+          </th>
+          
+         <!-- <th (click)="sort('Email');">
+            <i class="fa fa-at" aria-hidden="true"></i> Email
+          </th>
+        -->
+       <!--   <th (click)="sort('Department');">
+            <i class="fa fa-building" aria-hidden="true"></i> Department
+          </th>
+
+        -->
+        <th>
+            <i class="fa fa-sticky-note" aria-hidden="true"></i> Notes
+        </th>
+          <th>
+            <i class="fa fa-users" aria-hidden="true"></i> Sub Owner(s)
+          </th>
+        </thead>
+        <tfoot></tfoot>
+        <tbody>
+          <td *ngIf=!filteredCheckouts class="align-left" colspan="8">
+            No Server selected. Please select one from the dropdown.
+          </td>
+          <tr *ngFor='let checkout of filteredCheckouts'>
+            <td (click)="getCheckout(checkout.id)">
+              {{checkout.clientCode}}
+            </td>
+            <td *ngIf="!checkout.permanent; else permanent" (click)="getCheckout(checkout.id)">{{checkout.startDate}} - {{checkout.endDate}}</td>
+            <ng-template #permanent>
+              <td (click)="getCheckout(checkout.id)">
+                <button class="btn btn-primary text-white" data-toggle="tooltip" data-placement="top" title="Permanently Checked Out">
+                  <i class="fa fa-retweet" aria-hidden="true"></i> Permanent Checkout
+                </button>
+              </td>
+            </ng-template>
+            <td *ngIf="isCheckedout(checkout.startDate, checkout.endDate, checkout.permanent); else unlock ">
+              <button class="btn btn-success btn-block" data-toggle="tooltip" data-placement="top" title="Checked Out">
+                Active
+              </button>
+            </td>
+            <ng-template #unlock>
+              <td (click)="getCheckout(checkout.id)">
+                <button class="btn btn-danger btn-block" data-toggle="tooltip" data-placement="top" title="Not Checked Out">
+                  Expired
+                </button>
+              </td>
+            </ng-template>
+            <td>
+              <a href="http://jira.quadax.net/browse/{{checkout.jira}}" target="_blank">{{checkout.jira}}</a>
+            </td>
+            <td>
+              <a href="https://atbsvr.quadax.com/hde?{{checkout.hdevent}}" target="_blank">{{checkout.hdEvent}}</a>
+            </td>
+          <!--  <td (click)="getCheckout(checkout.id)">
+              <div *ngFor="let owner of checkout.owners">
+                <div *ngIf="owner.primary">
+                  <div *ngIf="owner.alert; else alertMainTbl" (click)="getCheckout(checkout.id)">
+                    <button class="btn btn-warning text-white" data-toggle="tooltip" data-placement="top" title="Alerts On">
+                      <i class="fa fa-bell" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <ng-template #alertMainTbl>
+                <div (click)="getCheckout(checkout.id)">
+                  <button class="btn btn-warning text-white" disabled data-toggle="tooltip" data-placement="top" title="Alerts Off">
+                    <i class="fa fa-bell-slash" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </ng-template>
+            </td> -->
+            <td (click)="getCheckout(checkout.id)">
+              <div *ngFor="let owner of checkout.owners">
+                <div *ngIf="owner.primary">
+                  {{owner.firstName}} {{owner.lastName}}
+                </div>
+              </div>
+            </td>
+            <td class="ui-g-nopad">
+  
+                <p-scrollPanel [style]="{width: '350px', height: '65px', padding: '0px 0px 0px 0px'}">
+                    <div style="padding:1em;line-height:1.5">
+                        {{checkout.notes}}
+                    </div>
+                </p-scrollPanel>
+              
+            </td>
+<!--            <td (click)="getCheckout(checkout.id)">
+              <div *ngFor="let owner of checkout.owners">
+                <div *ngIf="owner.primary">
+                  {{owner.email}}
+                </div>
+              </div>
+            </td>
+          -->
+    <!--        <td (click)="getCheckout(checkout.id)">
+              <div *ngFor="let owner of checkout.owners">
+                <div *ngIf="owner.primary">
+                  {{owner.department}}
+                </div>
+              </div>
+            </td>
+          -->
+            <td>
+              <button pButton type="button" (click)="viewSubOwners($event,checkout.owners,op)" label="View Sub Owner(s) Info" class="ui-button-info"></button>
+              <p-overlayPanel [dismissable]="true" #op>
+                <table class="">
+                  <thead class="bg-info text-white">
+                    <tr>
+                      <th>
+                        <i class="fa fa-address-card" aria-hidden="true"></i> SubOwner
+                      </th>
+                      <th>
+                        <i class="fa fa-at" aria-hidden="true"></i> Email
+                      </th>
+                      <th>
+                        <i class="fa fa-building" aria-hidden="true"></i> Department
+                      </th>
+                      <th>
+                        <i class="fa fa-bell" aria-hidden="true"></i> Alert
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor='let owner of selectedOwners'>
+                      <td>{{owner.firstName}} {{owner.lastName}}</td>
+                      <td>{{owner.email}}</td>
+                      <td>{{owner.department}}</td>
+                      <td *ngIf="owner.alert; else alert">
+                        <button class="btn btn-warning btn-sm text-white" data-toggle="tooltip" data-placement="top" title="Alerts On">
+                          <i class="fa fa-bell" aria-hidden="true"></i>
+                        </button>
+                      </td>
+                      <ng-template #alert>
+                        <td>
+                          <button class="btn btn-warning btn-sm text-white" disabled data-toggle="tooltip" data-placement="top" title="Alerts Off">
+                            <i class="fa fa-bell-slash" aria-hidden="true"></i>
+                          </button>
+                        </td>
+                      </ng-template>
+                    </tr>
+                  </tbody>
+                </table>
+              </p-overlayPanel>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p-growl [(value)]="msgs"></p-growl>
+    <p-overlayPanel [dismissable]="true" #op>
+      <table>
+        <thead *ngIf="selectedOwner">
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Department</th>
+            <th>Alert</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor='let owner of selectedOwner'>
+            <td>{{owner.firstName}}</td>
+            <td>{{owner.lastName}}</td>
+            <td>{{owner.email}}</td>
+            <td>{{owner.Department}}</td>
+            <td>{{owner.alert}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </p-overlayPanel>
+    <p-dialog [closable]="false" [(visible)]="display" [modal]="true" [width]="1600">
+      <p-header class="align-center">
+        {{formTitle}} Checkout Record
+      </p-header>
+      <div appendTo="body" style="width: 100%; height:100%;">
+        <form novalidate [formGroup]="checkoutForm">
+            <p-panel class="pb-2">
+                <p-header>
+                    <div class="ui-helper-clearfix">
+                        <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px"> 
+                          <i class="fa fa-list-alt" aria-hidden="true"></i> Checkout Info</span>
+                    </div>
+                </p-header>
+          <div class="ui-g ui-fluid pt-2">
+            <div class="ui-g-3">
+              <div class="ui-float-label">
+                <input type="text" pInputText formControlName="clientCode" id="clientCodeId" />
+                <label for="clientCodeId">
+                  <i class="fa fa-handshake-o" aria-hidden="true"> </i> Client Code</label>
+              </div>
+              
+            </div>
+            <div class="ui-g-3 pt-2">
+                <div class="ui-message ui-messages-error ui-corner-all" *ngIf="!checkoutForm.get('clientCode').valid && checkoutForm.get('clientCode').dirty">
+                    <i class="fa fa-close"></i>
+                    Client Code is required
+                </div>
+            </div>
+          </div>
+          <div class="ui-g ui-fluid pt-2">
+              <div formGroupName="dateRangeGroup" [ngClass]="{'has-error': checkoutForm.get('dateRangeGroup').errors  &&
+                                                                     !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+              <div class="ui-g-4">
+                <div class="ui-float-label">
+                  <p-calendar formControlName="startDate" id="startDateId" [showIcon]="true" readonlyInput="true"></p-calendar>
+                  <label for="startDateId">
+                    <i class="fa fa-calendar" aria-hidden="true"> </i> Start Date</label>
+                </div>
+              </div>
+              <div class="ui-g-4">
+                <div class="ui-float-label">
+                  <p-calendar formControlName="endDate" id="endDateId" [showIcon]="true" readonlyInput="true"></p-calendar>
+                  <label for="endDateId">
+                    <i class="fa fa-calendar" aria-hidden="true"> </i> End Date</label>
+                </div>
+              </div>
+                <div class="ui-g-4 pt-2">
+                    <div class="ui-message ui-messages-error ui-corner-all" *ngIf="checkoutForm.get('dateRangeGroup').errors  &&
+                    !checkoutForm.get('dateRangeGroup.endDate').disabled">
+                        <i class="fa fa-close"></i>
+                        Invalid Date Range
+                    </div>
+                </div>
+            </div> 
+          </div>
+          <div class="ui-g ui-fluid pt-2">
+              <div class="ui-g-4">
+                  <p-checkbox label="Permanent Checkout" [formControl]="checkoutForm.get('permanent')" binary=true> </p-checkbox>
+                </div>
+          </div>
+          <div class="ui-g ui-fluid pt-2">
+              <div class="ui-g-4">
+                <div class="ui-float-label">
+                    <input type="text" pInputText formControlName="jira" id="jiraId" />
+                    <label for="jiraId">
+                      <i class="fa fa-child" aria-hidden="true"> </i> Jira Issue</label>
+                </div>
+              </div>
+            </div>
+          <div class="ui-g ui-fluid pt-2">
+              <div class="ui-g-4">
+                <div class="ui-float-label">
+                    <input type="text" pInputText formControlName="hdEvent" id="hdEventId" />
+                    <label for="hdEventId">
+                      <i class="fa fa-bug" aria-hidden="true"> </i> Help Desk Event</label>
+                </div>
+              </div>
+            </div>
+          <div class="ui-g ui-fluid pt-2">
+            <div class="ui-g-4">
+              <div class="ui-float-label">
+                  <textarea pInputTextarea [(ngModel)]="property" formControlName="notes" id="notesId"></textarea>
+                <label for="notesId">
+                  <i class="fa fa-sticky-note" aria-hidden="true"> </i> Notes</label>
+              </div>
+            </div>
+          </div>
+            </p-panel>
+            
+          <p-panel>
+              <p-header>
+                  <div class="ui-helper-clearfix">
+                      <span class="ui-panel-title" style="font-size:16px;display:inline-block;margin-top:2px"> 
+                        <i class="fa fa-users" aria-hidden="true"></i> Owner(s) Info</span>
+          
+                  </div>
+              </p-header>
+            <div formArrayName='owners'>
+              <div class="ui-g ui-fluid ui-g-nopad pt-2" [formGroupName]="i" *ngFor="let owner of owners.controls; let i=index">
+                <div class="ui-g-3" [ngClass]="{'alert alert-success': owner.primary}">
+                  <div class="ui-float-label">
+                    <input type="text" pInputText formControlName="firstName" id="{{ownerFirstNameId + i}}" />
+                    <label attr.for="{{ownerFirstNameId + i}}">
+                      <i class="fa fa-address-card" aria-hidden="true"></i> First Name</label>
+                  </div>
+                </div>
+                <div class="ui-g-3">
+                  <div class="ui-float-label">
+                    <input type="text" pInputText formControlName="lastName" id="{{ownerLastNameId + i}}" />
+                    <label attr.for="{{ownerLastNameId + i}}">
+                      <i class="fa fa-address-card" aria-hidden="true"> </i> Last Name</label>
+                  </div>
+                </div>
+                <div class="ui-g-3">
+                  <div class="ui-float-label">
+                    <input type="email" pInputText formControlName="email" id="{{ownerEmailId + i}}" />
+                    <label attr.for="{{ownerEmailId + i}}">
+                      <i class="fa fa-at" aria-hidden="true"></i> Email</label>
+                  </div>
+                </div>
+                <div class="ui-g-3">
+                  <div class="ui-float-label">
+                    <input type="text" pInputText formControlName="department" id="{{ownerDepartmentId + i}}" />
+                    <label attr.for="{{ownerDepartmentId + i}}">
+                      <i class="fa fa-building" aria-hidden="true"></i> Department</label>
+                  </div>
+                </div>
+                <div class="ui-g-3">
+                    <label attr.for="{{ownerAlertId + i}}">Email Alerts</label>
+                    <p-checkbox [formControl]="owners.get(i+'.alert')" binary=true> </p-checkbox>
+                  </div>
+                <div class="ui-g-3">
+                  <label attr.for="{{ownerClientId + i}}">Client Owner</label>
+                  <p-checkbox [formControl]="owners.get(i+'.client')" binary=true> </p-checkbox>
+                </div>
+                <div class="ui-g-3">
+                  <label attr.for="{{ownerPrimaryId + i}}">Primary Owner</label>
+                  <p-checkbox [formControl]="owners.get(i+'.primary')" binary=true> </p-checkbox>
+                </div>
+              </div>
+            
+                 
+              
+              <div class="ui-g pl-2">
+                <button type="button" pButton [disabled]=disabled (click)="addOwner();" class="ui-button-success" icon="fa-user-plus" label="Owner"></button>
+                <button type="button" pButton [disabled]=disabled (click)="removeOwner();" class="ui-button-danger" icon="fa-user-times"
+                  label="Owner"></button>
+              </div>
+            </div>
+          </p-panel>
+        </form>
+      </div>
+      <p-footer>
+        <div class="ui-g ui-fluid ui-g-nopad">
+          <div class="ui-g-1" *ngIf="formTitle != 'Add' || formTitle != 'Edit'">
+            <button [disabled]=!disabled class="btn btn-info" [hidden]=!disabled (click)='enableForm("Edit")' data-toggle="tooltip" data-placement="top"
+              title="Update Entry">
+              Edit
+              <i class="fa fa-edit fa-lg"></i>
+            </button>
+            <button (click)='saveCheckout();' class="btn btn-primary" [hidden]=disabled label="Save" type="submit" [disabled]="!checkoutForm.valid"
+              data-toggle="tooltip" data-placement="top" title="Save Entry">
+              Save
+              <i class="fa fa-save fa-lg"></i>
+            </button>
+          </div>
+          <div class="ui-g-1">
+            <button *ngIf="formTitle != 'Add';" class="btn btn-danger" (click)="confirm('remove');" data-toggle="tooltip" data-placement="top"
+              title="Delete Entry">
+              Delete
+              <i class="fa fa-trash fa-lg"></i>
+            </button>
+          </div>
+          <div class="ui-g-10">
+            <button class="btn btn-secondary" (click)="confirm('cancel')">
+              Close
+              <i class="fa fa-times fa-lg"></i>
+            </button>
+          </div>
+        </div>
+      </p-footer>
+    </p-dialog>
+
+
+
+    <!--
+    <form class="form-horizontal" novalidate (ngSubmit)="save()" [formGroup]="checkoutForm">
+      <fieldset>
+
+    <form class="form-horizontal" novalidate (ngSubmit)="save()" [formGroup]="checkoutForm">
+      <fieldset>
+        <div class="ui-g ui-fluid">
+          <div class="ui-g-12 ui-md-1">
+            <div class="ui-float-label">
+              <input type="text" pInputText formControlName="clientCode" id="clientCodeId" />
+              <label for="clientCodeId">Client Code</label>
+            </div>
+          </div>
+          <div formGroupName="dateRangeGroup" [ngClass]="{'has-error': checkoutForm.get('dateRangeGroup').errors  &&
+                                                            !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+            <div class="ui-g-12 ui-md-4">
+              <div class="ui-float-label">
+                <p-calendar formControlName="startDate" id="startDateId" [showIcon]="true" readonlyInput="true"></p-calendar>
+                <label for="startDateId">Start Date</label>
+              </div>
+            </div>
+            <div class="ui-g-12 ui-md-4">
+              <div class="ui-float-label">
+                <p-calendar formControlName="endDate" id="endDateId" [showIcon]="true" readonlyInput="true"></p-calendar>
+                <label for="endDateId">End Date</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui-g-12 ui-md-2">
+            Permanent Checkout
+            <input id="permanentId" type="checkbox" formControlName="permanent" />
+          </div>
+          <div formArrayName='ownersGroup'>
+            <div [formGroupName]="i" *ngFor="let owner of ownersGroup.controls; let i=index">
+              <div class="ui-g-12 ui-md-4">
+                <div class="ui-float-label">
+                  <input type="text" pInputText formControlName="firstName" id="{{ownerFirstNameId + i}}" />
+                  <label attr.for="{{ownerFirstNameId + i}}">First Name</label>
+                </div>
+              </div>
+              <div class="ui-g-12 ui-md-4">
+
+                <label attr.for="{{ownerLastNameId + i}}">Last Name</label>
+                <div class="col-md-5">
+                  <input class="form-control" id="{{ownerLastNameId + i}}" type="text" placeholder="Last Name (required)" formControlName="lastName"
+                  />
+                </div>
+                <div class="ui-g-12 ui-md-4">
+                  <label attr.for="{{ownerEmailId + i}}">Email</label>
+                  <div>
+                    <input class="form-control" id="{{ownerEmailId + i}}" type="email" placeholder="Email (required)" formControlName="email"
+                    />
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-md-4">
+                  <label attr.for="{{ownerAlertId + i}}">Email Alerts</label>
+                  <div>
+                    <input id="{{ownerAlertId + i}}" type="checkbox" formControlName="alert">
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div>
+
+            <button type="button" pButton (click)="addOwner();" class="ui-button-success" icon="fa-plus" label="Add Owner"></button>
+            <button type="button" pButton (click)="removeOwner();" class="ui-button-danger" icon="fa-minus" label="Remove Owner"></button>
+
+
+          </div>
+        </div>
+      </fieldset>
+    </form>
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        {{formTitle}} :
+      </div>
+      <div class="panel-body">
+        <form class="form-horizontal" novalidate (ngSubmit)="save()" [formGroup]="checkoutForm">
+          <fieldset>
+
+
+          
+            <div formGroupName="dateRangeGroup" [ngClass]="{'has-error': checkoutForm.get('dateRangeGroup').errors  &&
+                                                            !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+              <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('dateRangeGroup.startDate').touched ||
+                                                 checkoutForm.get('dateRangeGroup.startDate').dirty) && 
+                                                !checkoutForm.get('dateRangeGroup.startDate').valid  &&
+                                                !checkoutForm.get('dateRangeGroup.startDate').disabled}">
+                <label class="col-md-2 control-label" for="startDateId">Start Date</label>
+                <div class="col-md-4">
+                  <p-calendar formControlName="startDate" id="startDateId" [showIcon]="true" placeholder="Start Date (required)" readonlyInput="true"></p-calendar>
+
+                  <span class="help-block" *ngIf="(checkoutForm.get('dateRangeGroup.startDate').touched ||
+                                                     checkoutForm.get('dateRangeGroup.startDate').dirty) && 
+                                                     checkoutForm.get('dateRangeGroup.startDate').errors">
+                    <span *ngIf="checkoutForm.get('dateRangeGroup.startDate').errors.required">
+                      Please enter a Start Date.
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <div class="form-group" [ngClass]="{'has-error': (checkoutForm.get('dateRangeGroup.endDate').touched ||
+                                                              checkoutForm.get('dateRangeGroup.endDate').dirty) &&
+                                                             !checkoutForm.get('dateRangeGroup.endDate').valid &&
+                                                             !checkoutForm.get('dateRangeGroup.endDate').disabled}">
+                <label class="col-md-2 control-label" for="endDateId">End Date</label>
+                <div class="col-md-4">
+                  <p-calendar formControlName="endDate" id="endDateId" [showIcon]="true" placeholder="End Date (required)" readonlyInput="true"></p-calendar>
+
+                  <span class="help-block" *ngIf="(checkoutForm.get('dateRangeGroup.endDate').touched ||
+                                                     checkoutForm.get('dateRangeGroup.endDate').dirty) &&
+                                                     !checkoutForm.get('dateRangeGroup.endDate').disabled &&
+                                                     (checkoutForm.get('dateRangeGroup.endDate').errors  ||
+                                                     checkoutForm.get('dateRangeGroup').errors)">
+                    <span *ngIf="checkoutForm.get('dateRangeGroup.endDate').errors?.required">
+                      Please enter a End Date.
+                    </span>
+                    <span *ngIf="checkoutForm.get('dateRangeGroup').errors?.range">
+                      End Date must be greater than Start Date.
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          -->
+
+    <br>Dirty: {{ checkoutForm.dirty }}
+    <br>Touched: {{ checkoutForm.touched }}
+    <br>Valid: {{ checkoutForm.valid }}
+    <br>Value: {{ checkoutForm.value | json }}
+    <br>formTitle: {{formTitle}}
+    <br>client code touch: {{checkoutForm.get('clientCode').touched}}
+    <br>client code prestine: {{checkoutForm.get('clientCode').pristine}}
+  </div>
+</div>
